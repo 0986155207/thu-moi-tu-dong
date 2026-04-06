@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Ứng dụng tạo thư mời tự động - Thiết kế, quản lý và gửi thư mời chuyên nghiệp qua Zalo">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0F0F1A">
+  <title>Thư Mời Tự Động - Tạo & Gửi Thư Mời Chuyên Nghiệp</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✉️</text></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css?v=2">
+  <link rel="stylesheet" href="css/template.css?v=2">
+  <link rel="stylesheet" href="css/animations.css?v=2">
+  <link rel="stylesheet" href="css/responsive.css?v=2">
+</head>
+<body>
+  <!-- Animated Particles Background -->
+  <div class="particles-bg">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- ========== HEADER ========== -->
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="app-logo">
+          <div class="app-logo-icon">✉️</div>
+          <span class="app-logo-text">Thư Mời Tự Động</span>
+        </div>
+
+        <nav class="nav-tabs" id="mainNav">
+          <button class="nav-tab active" data-page="editor" onclick="App.navigate('editor')">
+            <i class="fas fa-palette"></i>
+            <span class="tab-label">Tạo Thư Mời</span>
+          </button>
+          <button class="nav-tab" data-page="guests" onclick="App.navigate('guests')">
+            <i class="fas fa-users"></i>
+            <span class="tab-label">Danh Sách Khách</span>
+            <span class="badge" id="guestBadge" style="display:none">0</span>
+          </button>
+          <button class="nav-tab" data-page="send" onclick="App.navigate('send')">
+            <i class="fas fa-paper-plane"></i>
+            <span class="tab-label">Gửi Zalo</span>
+          </button>
+          <button class="nav-tab" data-page="export" onclick="App.navigate('export')">
+            <i class="fas fa-file-export"></i>
+            <span class="tab-label">Xuất & In</span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="main-content">
+
+      <!-- ===== PAGE: Editor ===== -->
+      <div class="page-view active" id="page-editor">
+        <div class="section">
+          <h1 class="section-title">
+            <i class="fas fa-magic"></i> Thiết kế thư mời
+          </h1>
+          
+          <!-- Template Selector -->
+          <div class="card mb-lg">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-swatchbook"></i> Chọn mẫu</div>
+              <div class="dropdown">
+                <button class="btn btn-ghost btn-sm" onclick="App.toggleDropdown(this)">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <button class="dropdown-item" onclick="TemplateEditor.saveTemplate()">
+                    <i class="fas fa-save"></i> Lưu mẫu hiện tại
+                  </button>
+                  <button class="dropdown-item" onclick="TemplateEditor.showSavedTemplates()">
+                    <i class="fas fa-folder-open"></i> Mẫu đã lưu
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-item" onclick="TemplateEditor.resetTemplate()">
+                    <i class="fas fa-redo"></i> Đặt lại mặc định
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="template-grid" id="templateGrid">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Editor + Preview Layout -->
+          <div class="editor-layout">
+            <!-- Editor Form -->
+            <div class="editor-panel">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fas fa-edit"></i> Nội dung thư mời</div>
+                </div>
+                <div id="editorForm">
+                  <!-- Rendered by JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Preview -->
+            <div class="preview-panel">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fas fa-eye"></i> Xem trước</div>
+                </div>
+                <div class="invitation-card-wrapper" id="invitationPreview">
+                  <!-- Rendered by JS -->
+                </div>
+              </div>
+              <div class="preview-actions no-print">
+                <button class="btn btn-primary btn-sm" onclick="ExportPrint.exportCurrentImage()">
+                  <i class="fas fa-image"></i> Xuất ảnh
+                </button>
+                <button class="btn btn-accent btn-sm" onclick="ExportPrint.exportCurrentPDF()">
+                  <i class="fas fa-file-pdf"></i> Xuất PDF
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="ExportPrint.printCurrent()">
+                  <i class="fas fa-print"></i> In
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGE: Guest Manager ===== -->
+      <div class="page-view" id="page-guests">
+        <div class="section">
+          <h1 class="section-title">
+            <i class="fas fa-users"></i> Quản lý khách mời
+          </h1>
+
+          <!-- Stats -->
+          <div class="stats-grid" id="guestStats">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Toolbar -->
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <button class="btn btn-primary" onclick="GuestManager.showAddModal()">
+                <i class="fas fa-plus"></i> <span class="btn-text">Thêm khách</span>
+              </button>
+              <button class="btn btn-outline" onclick="GuestManager.importExcel()">
+                <i class="fas fa-file-excel"></i> <span class="btn-text">Nhập Excel</span>
+              </button>
+              <button class="btn btn-outline" onclick="GuestManager.exportExcel()">
+                <i class="fas fa-download"></i> <span class="btn-text">Xuất Excel</span>
+              </button>
+            </div>
+            <div class="toolbar-right">
+              <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Tìm tên, SĐT, email..." 
+                       oninput="GuestManager.setSearch(this.value)" id="guestSearch">
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter Buttons -->
+          <div class="d-flex gap-sm mb-lg" style="flex-wrap:wrap">
+            <button class="btn btn-sm filter-btn active" data-filter="all" onclick="GuestManager.setFilter('all')">
+              Tất cả
+            </button>
+            <button class="btn btn-sm btn-outline filter-btn" data-filter="pending" onclick="GuestManager.setFilter('pending')">
+              🕐 Chưa gửi
+            </button>
+            <button class="btn btn-sm btn-outline filter-btn" data-filter="sent" onclick="GuestManager.setFilter('sent')">
+              📨 Đã gửi
+            </button>
+            <button class="btn btn-sm btn-outline filter-btn" data-filter="confirmed" onclick="GuestManager.setFilter('confirmed')">
+              ✅ Xác nhận
+            </button>
+            <button class="btn btn-sm btn-outline filter-btn" data-filter="declined" onclick="GuestManager.setFilter('declined')">
+              ❌ Từ chối
+            </button>
+          </div>
+
+          <!-- Guest Table -->
+          <div id="guestTable">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGE: Zalo Sender ===== -->
+      <div class="page-view" id="page-send">
+        <div class="section">
+          <h1 class="section-title">
+            <i class="fas fa-paper-plane"></i> Gửi thư mời qua Zalo
+          </h1>
+          <div id="zaloContent">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGE: Export & Print ===== -->
+      <div class="page-view" id="page-export">
+        <div class="section">
+          <h1 class="section-title">
+            <i class="fas fa-file-export"></i> Xuất & In ấn
+          </h1>
+          <div id="exportContent">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ========== MODAL OVERLAY ========== -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+
+  <!-- ========== TOAST CONTAINER ========== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ========== EXTERNAL LIBRARIES ========== -->
+  <!-- html2canvas -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script src="js/storage.js"></script>
+  <script src="js/template-editor.js"></script>
+  <script src="js/guest-manager.js"></script>
+  <script src="js/zalo-sender.js"></script>
+  <script src="js/export-print.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

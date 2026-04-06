@@ -1,0 +1,479 @@
+/* ============================================
+   THƯ MỜI TỰ ĐỘNG - Template Styles
+   8 Template Color Schemes
+   ============================================ */
+
+/* ---- Base Invitation Card ---- */
+.invitation-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  font-family: var(--font-body);
+  display: flex;
+  border-radius: var(--radius-md);
+}
+
+.invitation-card * {
+  box-sizing: border-box;
+}
+
+/* ---- Card Layout ---- */
+.card-left {
+  flex: 1.1;
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.card-right {
+  flex: 0.9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  padding: 30px;
+}
+
+/* ---- Decorative Elements ---- */
+.card-decor-circle-1 {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  top: -40px;
+  right: -20px;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+.card-decor-circle-2 {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  top: 30px;
+  right: 70px;
+  z-index: 1;
+  opacity: 0.4;
+}
+
+.card-decor-circle-3 {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  bottom: -20px;
+  right: 40%;
+  z-index: 1;
+  opacity: 0.3;
+}
+
+.card-decor-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 3;
+}
+
+/* ---- Organization Header ---- */
+.card-org {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.card-org-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.card-org-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ---- Event Title ---- */
+.card-event-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.card-event-subtitle {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+/* ---- Invitation Text ---- */
+.card-invite-text {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+}
+
+/* ---- Event Details ---- */
+.card-event-detail {
+  margin-bottom: 6px;
+}
+
+.card-event-name {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.card-topic {
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1.3;
+  margin-top: 4px;
+}
+
+.card-topic-highlight {
+  display: block;
+}
+
+/* ---- Speaker Section ---- */
+.card-speaker-photo {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.card-speaker-name-box {
+  padding: 8px 28px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.card-guest-name {
+  margin-top: 10px;
+  font-size: 0.75rem;
+  font-style: italic;
+  opacity: 0.85;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+/* ---- Footer Info ---- */
+.card-footer {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.card-footer-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-footer-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+}
+
+.card-footer-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+
+.card-footer-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* ---- Location ---- */
+.card-location {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.card-location i {
+  font-size: 0.8rem;
+}
+
+/* =============================================
+   TEMPLATE 1: Forest Green (Như mẫu)
+   ============================================= */
+.template-forest-green {
+  background: linear-gradient(135deg, #2D5F3E 0%, #1E3F2B 100%);
+  color: #ffffff;
+}
+
+.template-forest-green .card-decor-circle-1 { background: #D4A843; }
+.template-forest-green .card-decor-circle-2 { background: #D4A843; }
+.template-forest-green .card-decor-circle-3 { background: #D4A843; }
+.template-forest-green .card-decor-line { background: linear-gradient(90deg, #D4A843, #2D5F3E); }
+.template-forest-green .card-topic-highlight { color: #D4A843; }
+.template-forest-green .card-speaker-photo { border-color: #2D5F3E; box-shadow: 0 0 0 3px #D4A843, 0 4px 20px rgba(0,0,0,0.3); }
+.template-forest-green .card-speaker-name-box { background: linear-gradient(135deg, #D4A843, #C49B38); color: #1E3F2B; }
+.template-forest-green .card-footer-icon { background: rgba(212, 168, 67, 0.2); color: #D4A843; }
+
+/* =============================================
+   TEMPLATE 2: Ocean Blue
+   ============================================= */
+.template-ocean-blue {
+  background: linear-gradient(135deg, #0C2D48 0%, #145374 50%, #0C2D48 100%);
+  color: #ffffff;
+}
+
+.template-ocean-blue .card-decor-circle-1 { background: #2E8BC0; }
+.template-ocean-blue .card-decor-circle-2 { background: #2E8BC0; }
+.template-ocean-blue .card-decor-circle-3 { background: #2ECDFD; }
+.template-ocean-blue .card-decor-line { background: linear-gradient(90deg, #2E8BC0, #2ECDFD, #2E8BC0); }
+.template-ocean-blue .card-topic-highlight { color: #2ECDFD; }
+.template-ocean-blue .card-speaker-photo { border-color: #145374; box-shadow: 0 0 0 3px #2E8BC0, 0 4px 20px rgba(0,0,0,0.3); }
+.template-ocean-blue .card-speaker-name-box { background: linear-gradient(135deg, #2E8BC0, #145374); color: #ffffff; }
+.template-ocean-blue .card-footer-icon { background: rgba(46, 139, 192, 0.2); color: #2ECDFD; }
+
+/* =============================================
+   TEMPLATE 3: Sunset Coral
+   ============================================= */
+.template-sunset-coral {
+  background: linear-gradient(135deg, #6B2D5B 0%, #A83279 50%, #F56A79 100%);
+  color: #ffffff;
+}
+
+.template-sunset-coral .card-decor-circle-1 { background: #F8B500; }
+.template-sunset-coral .card-decor-circle-2 { background: #F56A79; }
+.template-sunset-coral .card-decor-circle-3 { background: #F8B500; }
+.template-sunset-coral .card-decor-line { background: linear-gradient(90deg, #F8B500, #F56A79, #F8B500); }
+.template-sunset-coral .card-topic-highlight { color: #F8B500; }
+.template-sunset-coral .card-speaker-photo { border-color: #6B2D5B; box-shadow: 0 0 0 3px #F8B500, 0 4px 20px rgba(0,0,0,0.3); }
+.template-sunset-coral .card-speaker-name-box { background: linear-gradient(135deg, #F8B500, #F56A79); color: #ffffff; }
+.template-sunset-coral .card-footer-icon { background: rgba(248, 181, 0, 0.2); color: #F8B500; }
+
+/* =============================================
+   TEMPLATE 4: Royal Purple
+   ============================================= */
+.template-royal-purple {
+  background: linear-gradient(135deg, #1A0533 0%, #3C1768 50%, #5B2C8E 100%);
+  color: #ffffff;
+}
+
+.template-royal-purple .card-decor-circle-1 { background: #E0A3FF; }
+.template-royal-purple .card-decor-circle-2 { background: #C77DFF; }
+.template-royal-purple .card-decor-circle-3 { background: #E0A3FF; }
+.template-royal-purple .card-decor-line { background: linear-gradient(90deg, #9D4EDD, #E0A3FF, #9D4EDD); }
+.template-royal-purple .card-topic-highlight { color: #E0A3FF; }
+.template-royal-purple .card-speaker-photo { border-color: #3C1768; box-shadow: 0 0 0 3px #9D4EDD, 0 4px 20px rgba(0,0,0,0.3); }
+.template-royal-purple .card-speaker-name-box { background: linear-gradient(135deg, #9D4EDD, #7B2FBE); color: #ffffff; }
+.template-royal-purple .card-footer-icon { background: rgba(157, 78, 221, 0.2); color: #E0A3FF; }
+
+/* =============================================
+   TEMPLATE 5: Elegant Dark
+   ============================================= */
+.template-elegant-dark {
+  background: linear-gradient(135deg, #0D0D0D 0%, #1A1A2E 50%, #16213E 100%);
+  color: #ffffff;
+}
+
+.template-elegant-dark .card-decor-circle-1 { background: #C9A84C; }
+.template-elegant-dark .card-decor-circle-2 { background: #C9A84C; }
+.template-elegant-dark .card-decor-circle-3 { background: #8B7332; }
+.template-elegant-dark .card-decor-line { background: linear-gradient(90deg, #C9A84C, #8B7332, #C9A84C); }
+.template-elegant-dark .card-topic-highlight { color: #C9A84C; }
+.template-elegant-dark .card-speaker-photo { border-color: #1A1A2E; box-shadow: 0 0 0 3px #C9A84C, 0 4px 20px rgba(0,0,0,0.5); }
+.template-elegant-dark .card-speaker-name-box { background: linear-gradient(135deg, #C9A84C, #A08838); color: #0D0D0D; }
+.template-elegant-dark .card-footer-icon { background: rgba(201, 168, 76, 0.15); color: #C9A84C; }
+
+/* =============================================
+   TEMPLATE 6: Cherry Blossom
+   ============================================= */
+.template-cherry-blossom {
+  background: linear-gradient(135deg, #FCE4EC 0%, #F8BBD0 50%, #F48FB1 100%);
+  color: #4A1942;
+}
+
+.template-cherry-blossom .card-decor-circle-1 { background: #ffffff; opacity: 0.5; }
+.template-cherry-blossom .card-decor-circle-2 { background: #ffffff; opacity: 0.4; }
+.template-cherry-blossom .card-decor-circle-3 { background: #E91E63; opacity: 0.15; }
+.template-cherry-blossom .card-decor-line { background: linear-gradient(90deg, #E91E63, #F48FB1, #E91E63); }
+.template-cherry-blossom .card-topic-highlight { color: #C2185B; }
+.template-cherry-blossom .card-speaker-photo { border-color: #F48FB1; box-shadow: 0 0 0 3px #E91E63, 0 4px 20px rgba(0,0,0,0.15); }
+.template-cherry-blossom .card-speaker-name-box { background: linear-gradient(135deg, #E91E63, #C2185B); color: #ffffff; }
+.template-cherry-blossom .card-footer-icon { background: rgba(233, 30, 99, 0.15); color: #C2185B; }
+.template-cherry-blossom .card-event-subtitle { opacity: 0.7; }
+.template-cherry-blossom .card-footer-label { opacity: 0.6; }
+
+/* =============================================
+   TEMPLATE 7: Golden Luxury
+   ============================================= */
+.template-golden-luxury {
+  background: linear-gradient(135deg, #1C1104 0%, #3E2409 50%, #5C3A12 100%);
+  color: #F5E6C8;
+}
+
+.template-golden-luxury .card-decor-circle-1 { background: #D4A843; }
+.template-golden-luxury .card-decor-circle-2 { background: #B8860B; }
+.template-golden-luxury .card-decor-circle-3 { background: #D4A843; }
+.template-golden-luxury .card-decor-line { background: linear-gradient(90deg, #D4A843, #FFD700, #D4A843); }
+.template-golden-luxury .card-event-title { color: #FFD700; }
+.template-golden-luxury .card-invite-text { color: #FFD700; }
+.template-golden-luxury .card-topic-highlight { color: #FFD700; }
+.template-golden-luxury .card-speaker-photo { border-color: #5C3A12; box-shadow: 0 0 0 3px #D4A843, 0 4px 20px rgba(0,0,0,0.4); }
+.template-golden-luxury .card-speaker-name-box { background: linear-gradient(135deg, #D4A843, #B8860B); color: #1C1104; }
+.template-golden-luxury .card-footer-icon { background: rgba(212, 168, 67, 0.2); color: #FFD700; }
+
+/* =============================================
+   TEMPLATE 8: Classic Red
+   ============================================= */
+.template-classic-red {
+  background: linear-gradient(135deg, #8B0000 0%, #B22222 50%, #CD2626 100%);
+  color: #ffffff;
+}
+
+.template-classic-red .card-decor-circle-1 { background: #FFD700; }
+.template-classic-red .card-decor-circle-2 { background: #FFD700; }
+.template-classic-red .card-decor-circle-3 { background: #FF6347; opacity: 0.3; }
+.template-classic-red .card-decor-line { background: linear-gradient(90deg, #FFD700, #B22222, #FFD700); }
+.template-classic-red .card-topic-highlight { color: #FFD700; }
+.template-classic-red .card-speaker-photo { border-color: #8B0000; box-shadow: 0 0 0 3px #FFD700, 0 4px 20px rgba(0,0,0,0.3); }
+.template-classic-red .card-speaker-name-box { background: linear-gradient(135deg, #FFD700, #DAA520); color: #8B0000; }
+.template-classic-red .card-footer-icon { background: rgba(255, 215, 0, 0.2); color: #FFD700; }
+
+/* ---- Template Preview Thumbnails ---- */
+.template-thumb {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  font-size: 0.65rem;
+  text-align: center;
+}
+
+.template-thumb .thumb-title {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.template-thumb .thumb-line {
+  width: 60%;
+  height: 2px;
+  border-radius: 1px;
+  margin: 3px 0;
+  opacity: 0.5;
+}
+
+.template-thumb .thumb-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-top: 6px;
+  border: 2px solid;
+  opacity: 0.7;
+}
+
+/* ---- Invitation Card Responsiveness ---- */
+.invitation-card-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.invitation-card-scaler {
+  width: 800px;
+  transform-origin: top left;
+}
+
+/* ---- Small Screen Card Override ---- */
+@media (max-width: 680px) {
+  .invitation-card {
+    flex-direction: column;
+    aspect-ratio: auto;
+  }
+  
+  .card-left {
+    padding: 24px 20px;
+  }
+  
+  .card-right {
+    padding: 20px;
+  }
+  
+  .card-speaker-photo {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .card-event-title {
+    font-size: 1.2rem;
+  }
+  
+  .card-footer {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+/* Style cho tên khách mời ở vị trí mới */
+.card-guest-name-left {
+  font-family: var(--font-script); /* Font chữ viết tay cho nghệ thuật */
+  font-size: 2rem;
+  color: var(--accent); /* Màu vàng accent của template */
+  margin: 5px 0;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Đảm bảo khối card-left không bị đẩy quá cao */
+.card-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.card-guest-name-new {
+  font-family: 'Dancing Script', cursive; /* Chữ nghệ thuật */
+  font-size: 2.2rem;
+  color: #D4A843; /* Màu vàng kim loại */
+  margin: 8px 0;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  display: block;
+}
