@@ -22,6 +22,11 @@ const App = {
     ZaloSender.init();
     ExportPrint.init();
 
+    // Init cloud sync
+    if (typeof FirebaseSync !== 'undefined') {
+      FirebaseSync.init();
+    }
+
     // Global click handler for dropdowns
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.dropdown')) {

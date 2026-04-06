@@ -4,6 +4,8 @@
    ============================================ */
 
 const Storage = {
+  _suppressSync: false, // Ngăn sync vòng lặp khi nhận dữ liệu từ cloud
+
   KEYS: {
     TEMPLATES: 'invitationApp_templates',
     GUESTS: 'invitationApp_guests',
@@ -25,6 +27,10 @@ const Storage = {
   set(key, value) {
     try {
       localStorage.setItem(key, JSON.stringify(value));
+      // Đồng bộ lên cloud sau mỗi thay đổi (trừ khi đang nhận dữ liệu từ cloud)
+      if (!this._suppressSync && typeof FirebaseSync !== 'undefined' && FirebaseSync.db) {
+        FirebaseSync.scheduleSync();
+      }
       return true;
     } catch (e) {
       console.error('Storage.set error:', e);
