@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Xác nhận tham dự</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✉️</text></svg>">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/template.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    body { background: var(--bg-primary); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 1.5rem 1rem 3rem; }
+
+    .rsvp-wrapper { width: 100%; max-width: 560px; }
+
+    .rsvp-header { text-align: center; margin-bottom: 1.5rem; }
+    .rsvp-header h1 { font-size: 1.1rem; color: var(--text-secondary); font-weight: 400; }
+
+    /* Card scale */
+    .card-scaler { width: 100%; overflow: hidden; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); margin-bottom: 1.75rem; }
+    .card-scaler-inner { width: 800px; transform-origin: top left; }
+
+    /* Action buttons */
+    .rsvp-actions { display: flex; flex-direction: column; gap: 0.75rem; }
+    .rsvp-btn { display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+                padding: 1rem 1.5rem; border-radius: 12px; font-size: 1rem; font-weight: 600;
+                border: none; cursor: pointer; transition: transform 0.15s, opacity 0.15s; width: 100%; }
+    .rsvp-btn:active { transform: scale(0.97); }
+    .rsvp-btn-confirm { background: linear-gradient(135deg, #4CAF50, #2E7D32); color: #fff; }
+    .rsvp-btn-decline { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border); }
+    .rsvp-btn-confirm:hover { opacity: 0.92; }
+    .rsvp-btn-decline:hover { border-color: var(--danger); color: var(--danger); }
+
+    /* States */
+    #stateLoading, #stateDone, #stateError { text-align: center; padding: 3rem 1rem; }
+    .spinner { width: 48px; height: 48px; border: 4px solid var(--border);
+               border-top-color: var(--primary); border-radius: 50%;
+               animation: spin 0.8s linear infinite; margin: 0 auto 1.25rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .done-icon { font-size: 4rem; margin-bottom: 1rem; }
+    .done-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .done-sub { color: var(--text-secondary); font-size: 0.9rem; }
+
+    #stateRsvp { display: none; }
+  </style>
+</head>
+<body>
+  <div class="rsvp-wrapper">
+    <div class="rsvp-header">
+      <h1>✉️ Thư Mời Tự Động</h1>
+    </div>
+
+    <!-- Loading -->
+    <div id="stateLoading">
+      <div class="spinner"></div>
+      <p style="color:var(--text-secondary)">Đang tải thư mời...</p>
+    </div>
+
+    <!-- RSVP Main -->
+    <div id="stateRsvp">
+      <div class="card-scaler">
+        <div class="card-scaler-inner" id="invitationCard"></div>
+      </div>
+      <div class="rsvp-actions">
+        <button class="rsvp-btn rsvp-btn-confirm" onclick="submitRsvp('confirmed')">
+          <i class="fas fa-check-circle"></i> Xác nhận tham dự
+        </button>
+        <button class="rsvp-btn rsvp-btn-decline" onclick="submitRsvp('declined')">
+          <i class="fas fa-times-circle"></i> Xin lỗi, tôi không đến được
+        </button>
+      </div>
+    </div>
+
+    <!-- Done -->
+    <div id="stateDone" style="display:none">
+      <div class="done-icon" id="doneIcon"></div>
+      <div class="done-title" id="doneTitle"></div>
+      <div class="done-sub" id="doneSub"></div>
+    </div>
+
+    <!-- Error -->
+    <div id="stateError" style="display:none">
+      <div class="done-icon">😕</div>
+      <div class="done-title">Không tìm thấy thư mời</div>
+      <div class="done-sub" id="errorMsg">Link không hợp lệ hoặc đã hết hạn.</div>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAoZsNvThRCAhg3AR0Mbx_TbRuH0vmYYQc",
+      authDomain: "thu-moi-tu-dong.firebaseapp.com",
+      projectId: "thu-moi-tu-dong",
+      storageBucket: "thu-moi-tu-dong.firebasestorage.app",
+      messagingSenderId: "556410345587",
+      appId: "1:556410345587:web:9b76c74a1c5a29b0b8f206"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Parse URL params
+    const params = new URLSearchParams(location.search);
+    const syncCode = params.get('s');
+    const guestId  = params.get('g');
+
+    let guestData = null;
+    let templateData = null;
+    let allGuests = [];
+
+    function showState(id) {
+      ['stateLoading', 'stateRsvp', 'stateDone', 'stateError'].forEach(s => {
+        document.getElementById(s).style.display = (s === id) ? 'block' : 'none';
+      });
+    }
+
+    async function loadInvitation() {
+      if (!syncCode || !guestId) {
+        showState('stateError');
+        return;
+      }
+
+      try {
+        const doc = await db.collection('syncData').doc(syncCode).get();
+        if (!doc.exists) { showState('stateError'); return; }
+
+        const data = doc.data();
+        allGuests = data.guests || [];
+        templateData = data.currentTemplate || {};
+        guestData = allGuests.find(g => g.id === guestId);
+
+        if (!guestData) { showState('stateError'); return; }
+
+        // If already responded
+        if (guestData.status === 'confirmed' || guestData.status === 'declined') {
+          showDone(guestData.status, true);
+          return;
+        }
+
+        renderCard();
+        showState('stateRsvp');
+        scaleCard();
+      } catch (e) {
+        console.error(e);
+        document.getElementById('errorMsg').textContent = 'Lỗi kết nối. Vui lòng thử lại.';
+        showState('stateError');
+      }
+    }
+
+    function renderCard() {
+      const t = templateData;
+      const guestName = guestData.name || '';
+      const eventDate = t.eventDate ? new Date(t.eventDate + 'T00:00:00').toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+      const theme = t.theme || 'forest-green';
+
+      document.getElementById('invitationCard').innerHTML = `
+        <div class="invitation-card theme-${theme}">
+          <div class="card-left">
+            <div class="card-org">
+              ${t.orgLogo ? `<img src="${esc(t.orgLogo)}" class="org-logo" alt="logo">` : ''}
+              <span class="org-name">${esc(t.orgName || '')}</span>
+            </div>
+            <div class="card-event-title">${esc(t.eventTitle || '')}</div>
+            <div class="card-event-subtitle">${esc(t.eventSubtitle || '')}</div>
+            <div class="card-invite-text">${esc(t.inviteText || 'TRÂN TRỌNG KÍNH MỜI')}</div>
+            <div class="card-guest-name">${esc(guestName)}</div>
+            <div class="card-event-name">${esc(t.eventName || '')}</div>
+            <div class="card-topic">${esc(t.eventTopic || '')}</div>
+            <div class="card-topic-highlight">${esc(t.topicHighlight || '')}</div>
+            <div class="card-datetime">
+              <span class="card-time">${esc(t.eventTime || '')}</span>
+              <span class="card-date">${eventDate}</span>
+              ${t.eventDay ? `<span class="card-day">${esc(t.eventDay)}</span>` : ''}
+            </div>
+            <div class="card-location"><i class="fas fa-map-marker-alt"></i> ${esc(t.eventLocation || '')}</div>
+          </div>
+          <div class="card-right">
+            ${t.speakerPhoto ? `<img src="${esc(t.speakerPhoto)}" class="speaker-photo" alt="speaker">` : '<div class="speaker-photo-placeholder"></div>'}
+            <div class="speaker-name">${esc(t.speakerName || '')}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function scaleCard() {
+      const wrapper = document.querySelector('.card-scaler');
+      const inner = document.querySelector('.card-scaler-inner');
+      if (!wrapper || !inner) return;
+      const scale = wrapper.clientWidth / 800;
+      inner.style.transform = `scale(${scale})`;
+      const cardEl = inner.firstElementChild;
+      if (cardEl) {
+        wrapper.style.height = (cardEl.offsetHeight * scale) + 'px';
+      }
+    }
+
+    async function submitRsvp(status) {
+      const btns = document.querySelectorAll('.rsvp-btn');
+      btns.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; });
+
+      try {
+        const updatedGuests = allGuests.map(g => {
+          if (g.id === guestId) return { ...g, status, updatedAt: new Date().toISOString() };
+          return g;
+        });
+        await db.collection('syncData').doc(syncCode).update({ guests: updatedGuests });
+        showDone(status, false);
+      } catch (e) {
+        console.error(e);
+        btns.forEach(b => { b.disabled = false; b.style.opacity = '1'; });
+        alert('Lỗi kết nối. Vui lòng thử lại.');
+      }
+    }
+
+    function showDone(status, alreadyAnswered) {
+      if (status === 'confirmed') {
+        document.getElementById('doneIcon').textContent = '🎉';
+        document.getElementById('doneTitle').textContent = 'Đã xác nhận tham dự!';
+        document.getElementById('doneSub').textContent = alreadyAnswered
+          ? 'Bạn đã xác nhận tham dự trước đó. Hẹn gặp bạn tại sự kiện!'
+          : 'Cảm ơn bạn! Chúng tôi rất vui được gặp bạn tại sự kiện.';
+      } else {
+        document.getElementById('doneIcon').textContent = '😢';
+        document.getElementById('doneTitle').textContent = 'Đã ghi nhận vắng mặt';
+        document.getElementById('doneSub').textContent = alreadyAnswered
+          ? 'Bạn đã từ chối tham dự trước đó. Rất tiếc khi bạn không thể đến.'
+          : 'Rất tiếc khi bạn không thể tham dự. Hẹn gặp lại lần sau!';
+      }
+      showState('stateDone');
+    }
+
+    function esc(str) {
+      if (!str) return '';
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    window.addEventListener('resize', scaleCard);
+    loadInvitation();
+  </script>
+</body>
+</html>

@@ -11,6 +11,8 @@ const ZaloSender = {
     this.renderSenderPage();
   },
 
+  activeTab: 'send', // 'send' | 'remind'
+
   renderSenderPage() {
     const container = document.getElementById('zaloContent');
     if (!container) return;
@@ -20,6 +22,20 @@ const ZaloSender = {
     const pendingGuests = guests.filter(g => g.status === 'pending' || g.status === 'sent');
 
     container.innerHTML = `
+      <!-- Top Tab: Gửi / Nhắc nhở -->
+      <div class="tab-group mb-lg" style="background:var(--bg-card);border-radius:var(--radius-lg);padding:4px;display:inline-flex;gap:4px">
+        <button class="tab ${this.activeTab === 'send' ? 'active' : ''}" onclick="ZaloSender.switchTab('send')">
+          <i class="fas fa-paper-plane"></i> Gửi thư mời
+        </button>
+        <button class="tab ${this.activeTab === 'remind' ? 'active' : ''}" onclick="ZaloSender.switchTab('remind')" style="position:relative">
+          <i class="fas fa-bell"></i> Nhắc nhở
+          ${guests.filter(g => g.status === 'sent').length > 0 ? `<span style="position:absolute;top:-4px;right:-4px;background:var(--warning);color:#000;font-size:0.65rem;font-weight:700;border-radius:10px;padding:1px 5px">${guests.filter(g => g.status === 'sent').length}</span>` : ''}
+        </button>
+      </div>
+
+      <!-- Panel: Gửi thư mời -->
+      <div id="tabSend" style="${this.activeTab !== 'send' ? 'display:none' : ''}">
+
       <!-- Mode Selection -->
       <div class="card mb-lg">
         <div class="card-header">
@@ -142,6 +158,12 @@ const ZaloSender = {
           </div>
           <div id="sendLog" class="mt-md" style="max-height:300px;overflow-y:auto;font-size:0.8rem;"></div>
         </div>
+      </div>
+      </div> <!-- end tabSend -->
+
+      <!-- Panel: Nhắc nhở -->
+      <div id="tabRemind" style="${this.activeTab !== 'remind' ? 'display:none' : ''}">
+        ${this.renderRemindTab(guests)}
       </div>
     `;
 
@@ -378,6 +400,101 @@ ${template.orgName}
     navigator.clipboard.writeText(text).then(() => {
       App.toast('Đã copy nội dung thư mời!', 'success');
     });
+  },
+
+  // ---- Tab switch ----
+  switchTab(tab) {
+    this.activeTab = tab;
+    this.renderSenderPage();
+  },
+
+  // ---- Remind Tab ----
+  renderRemindTab(guests) {
+    const sentGuests = guests.filter(g => g.status === 'sent' && g.phone);
+    const template = Storage.getCurrentTemplate ? Storage.getCurrentTemplate() : {};
+    const eventDate = template.eventDate ? new Date(template.eventDate + 'T00:00:00').toLocaleDateString('vi-VN') : '';
+
+    if (sentGuests.length === 0) {
+      return `
+        <div class="card">
+          <div class="empty-state" style="padding:var(--space-xl)">
+            <i class="fas fa-bell-slash"></i>
+            <h3>Không có khách cần nhắc</h3>
+            <p>Khách có trạng thái "Đã gửi" mà chưa xác nhận sẽ hiển thị ở đây.</p>
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div class="card mb-lg">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-bell"></i> Tin nhắn nhắc nhở</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nội dung nhắc nhở</label>
+          <textarea class="form-control" id="remindMessage" rows="5">Kính gửi {ten_khach},\n\nĐây là thư nhắc về sự kiện sắp tới vào ngày ${eventDate}.\n\nVui lòng xác nhận tham dự tại:\n{rsvp_link}\n\nTrân trọng cảm ơn!</textarea>
+          <div class="form-hint">Biến: <code>{ten_khach}</code> — tên khách, <code>{rsvp_link}</code> — link xác nhận RSVP</div>
+        </div>
+      </div>
+
+      <div class="card mb-lg">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-users"></i> Khách chưa xác nhận (${sentGuests.length})</div>
+        </div>
+        <div style="max-height:350px;overflow-y:auto">
+          ${sentGuests.map(g => `
+            <div class="d-flex align-center gap-sm" style="padding:8px 0;border-bottom:1px solid var(--border)">
+              <input type="checkbox" class="checkbox remind-check" data-id="${g.id}" checked>
+              <div style="flex:1;min-width:0">
+                <div class="fw-600" style="font-size:0.875rem">${this.escapeHtml(g.name)}</div>
+                <div class="text-muted" style="font-size:0.75rem">${g.phone}</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="ZaloSender.sendRemindSingle('${g.id}')" title="Nhắc riêng">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          `).join('')}
+        </div>
+        <div class="mt-md d-flex gap-sm justify-between" style="flex-wrap:wrap">
+          <div class="d-flex gap-sm">
+            <button class="btn btn-outline btn-sm" onclick="ZaloSender.remindSelectAll(true)"><i class="fas fa-check-double"></i> Chọn tất cả</button>
+            <button class="btn btn-outline btn-sm" onclick="ZaloSender.remindSelectAll(false)"><i class="fas fa-times"></i> Bỏ chọn</button>
+          </div>
+          <button class="btn btn-warning btn-sm" onclick="ZaloSender.startRemindBatch()">
+            <i class="fas fa-bell"></i> Gửi nhắc tất cả đã chọn
+          </button>
+        </div>
+      </div>`;
+  },
+
+  remindSelectAll(checked) {
+    document.querySelectorAll('.remind-check').forEach(cb => cb.checked = checked);
+  },
+
+  startRemindBatch() {
+    const ids = [...document.querySelectorAll('.remind-check:checked')].map(cb => cb.dataset.id);
+    if (ids.length === 0) { App.toast('Chọn ít nhất 1 khách!', 'warning'); return; }
+    ids.forEach((id, i) => setTimeout(() => this.sendRemindSingle(id), i * 2200));
+    App.toast(`Đang gửi nhắc ${ids.length} khách...`, 'info');
+  },
+
+  sendRemindSingle(id) {
+    const guest = Storage.getGuests().find(g => g.id === id);
+    if (!guest || !guest.phone) return;
+
+    const rsvpLink = GuestManager.getRsvpLink(id);
+    const template = document.getElementById('remindMessage')?.value ||
+      'Kính gửi {ten_khach}, vui lòng xác nhận tham dự: {rsvp_link}';
+
+    const message = template
+      .replace(/\{ten_khach\}/g, guest.name)
+      .replace(/\{rsvp_link\}/g, rsvpLink);
+
+    navigator.clipboard?.writeText(message).catch(() => {});
+
+    const phone = guest.phone.replace(/^0/, '84').replace(/[^0-9]/g, '');
+    window.open(`https://zalo.me/${phone}`, '_blank');
+    App.toast(`Đã mở Zalo nhắc ${guest.name}`, 'success');
   },
 
   escapeHtml(str) {

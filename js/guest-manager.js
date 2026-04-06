@@ -64,43 +64,80 @@ const GuestManager = {
     const statsEl = document.getElementById('guestStats');
     if (!statsEl) return;
 
+    const confirmRate = total > 0 ? Math.round((confirmed / total) * 100) : 0;
+
     statsEl.innerHTML = `
       <div class="stat-card" onclick="GuestManager.setFilter('all')">
         <div class="stat-icon purple"><i class="fas fa-users"></i></div>
-        <div class="stat-info">
-          <h4>${total}</h4>
-          <p>Tổng khách mời</p>
-        </div>
+        <div class="stat-info"><h4>${total}</h4><p>Tổng khách mời</p></div>
       </div>
       <div class="stat-card" onclick="GuestManager.setFilter('pending')">
         <div class="stat-icon yellow"><i class="fas fa-clock"></i></div>
-        <div class="stat-info">
-          <h4>${pending}</h4>
-          <p>Chưa gửi</p>
-        </div>
+        <div class="stat-info"><h4>${pending}</h4><p>Chưa gửi</p></div>
       </div>
       <div class="stat-card" onclick="GuestManager.setFilter('sent')">
         <div class="stat-icon blue"><i class="fas fa-paper-plane"></i></div>
-        <div class="stat-info">
-          <h4>${sent}</h4>
-          <p>Đã gửi</p>
-        </div>
+        <div class="stat-info"><h4>${sent}</h4><p>Đã gửi</p></div>
       </div>
       <div class="stat-card" onclick="GuestManager.setFilter('confirmed')">
         <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
-        <div class="stat-info">
-          <h4>${confirmed}</h4>
-          <p>Xác nhận</p>
-        </div>
+        <div class="stat-info"><h4>${confirmed}</h4><p>Xác nhận</p></div>
       </div>
       <div class="stat-card" onclick="GuestManager.setFilter('declined')">
         <div class="stat-icon red"><i class="fas fa-times-circle"></i></div>
-        <div class="stat-info">
-          <h4>${declined}</h4>
-          <p>Từ chối</p>
+        <div class="stat-info"><h4>${declined}</h4><p>Từ chối</p></div>
+      </div>
+
+      ${total > 0 ? `
+      <div class="stat-chart-card">
+        <div class="stat-chart-left">
+          <canvas id="rsvpChart" width="110" height="110"></canvas>
+        </div>
+        <div class="stat-chart-right">
+          <div class="chart-title">Tỷ lệ phản hồi</div>
+          <div class="chart-rate">${confirmRate}% xác nhận</div>
+          <div class="chart-legend">
+            <span class="legend-dot" style="background:#4CAF50"></span>Xác nhận (${confirmed})
+          </div>
+          <div class="chart-legend">
+            <span class="legend-dot" style="background:#2196F3"></span>Đã gửi (${sent})
+          </div>
+          <div class="chart-legend">
+            <span class="legend-dot" style="background:#FF9800"></span>Chưa gửi (${pending})
+          </div>
+          <div class="chart-legend">
+            <span class="legend-dot" style="background:#f44336"></span>Từ chối (${declined})
+          </div>
         </div>
       </div>
+      ` : ''}
     `;
+
+    if (total > 0) this.renderChart(confirmed, sent, pending, declined);
+  },
+
+  renderChart(confirmed, sent, pending, declined) {
+    const canvas = document.getElementById('rsvpChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    if (this._chart) { this._chart.destroy(); this._chart = null; }
+
+    this._chart = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [confirmed, sent, pending, declined],
+          backgroundColor: ['#4CAF50', '#2196F3', '#FF9800', '#f44336'],
+          borderWidth: 0,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        cutout: '70%',
+        plugins: { legend: { display: false }, tooltip: { enabled: true } },
+        animation: { duration: 600 }
+      }
+    });
   },
 
   renderTable() {
@@ -176,15 +213,19 @@ const GuestManager = {
                 <td>${statusLabels[g.status] || statusLabels.pending}</td>
                 <td class="text-center">
                   <div class="d-flex gap-sm" style="justify-content:center">
-                    <button class="btn btn-ghost btn-icon btn-sm" data-tooltip="Xem thư mời" 
+                    <button class="btn btn-ghost btn-icon btn-sm" data-tooltip="Xem thư mời"
                             onclick="GuestManager.previewInvitation('${g.id}')">
                       <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-ghost btn-icon btn-sm" data-tooltip="Sửa" 
+                    <button class="btn btn-ghost btn-icon btn-sm" data-tooltip="Copy link RSVP"
+                            onclick="GuestManager.copyRsvpLink('${g.id}')">
+                      <i class="fas fa-link"></i>
+                    </button>
+                    <button class="btn btn-ghost btn-icon btn-sm" data-tooltip="Sửa"
                             onclick="GuestManager.showEditModal('${g.id}')">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-ghost btn-icon btn-sm" data-tooltip="Xóa" 
+                    <button class="btn btn-ghost btn-icon btn-sm" data-tooltip="Xóa"
                             onclick="GuestManager.deleteGuest('${g.id}')">
                       <i class="fas fa-trash"></i>
                     </button>
@@ -547,6 +588,22 @@ const GuestManager = {
     setTimeout(() => {
       ExportPrint.batchExportPDF(ids);
     }, 300);
+  },
+
+  // ---- RSVP Link ----
+  getRsvpLink(guestId) {
+    const syncCode = localStorage.getItem('tmtd_syncCode') || '';
+    return `${location.origin}/rsvp.html?s=${syncCode}&g=${guestId}`;
+  },
+
+  copyRsvpLink(guestId) {
+    const guest = Storage.getGuests().find(g => g.id === guestId);
+    const link = this.getRsvpLink(guestId);
+    navigator.clipboard?.writeText(link).then(() => {
+      App.toast(`Đã copy link RSVP cho ${guest?.name}`, 'success');
+    }).catch(() => {
+      App.toast('Link: ' + link, 'info');
+    });
   },
 
   escapeHtml(str) {

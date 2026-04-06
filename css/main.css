@@ -897,10 +897,28 @@ select.form-control {
 /* ---- Stats Grid ---- */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: var(--space-md);
   margin-bottom: var(--space-xl);
 }
+
+/* Chart card spans full width on same grid */
+.stat-chart-card {
+  grid-column: 1 / -1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.stat-chart-left { flex-shrink: 0; }
+.stat-chart-right { flex: 1; min-width: 0; }
+.chart-title { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.2rem; }
+.chart-rate { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.6rem; }
+.chart-legend { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
 .stat-card {
   background: var(--bg-glass);
